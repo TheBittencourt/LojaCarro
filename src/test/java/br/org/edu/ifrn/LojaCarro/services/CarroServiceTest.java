@@ -16,7 +16,7 @@ class CarroServiceTest {
     // Busca de veículo por ID (já existe no data.sql)
     @Test
     void deveBuscarCarroPorId() {
-        var carro = carroService.findById(99L).orElseThrow();
+        var carro = carroService.findById(1L).orElseThrow();
         assertEquals("Uno", carro.getModelo());
         assertEquals(2010, carro.getAno());
     }
@@ -46,7 +46,7 @@ class CarroServiceTest {
     @Test
     void deveAtualizarCarro() {
         var carro = carroService.findById(2L).orElseThrow();
-        carro.setAno(20);
+        carro.setAno(2020);
         Carro atualizado = carroService.update(carro);
 
         assertEquals(2020, atualizado.getAno());

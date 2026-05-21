@@ -10,6 +10,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: lojacarros
+          MYSQL_USER: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
     steps:
       - name: Checkout código
         uses: actions/checkout@v4
@@ -17,9 +32,27 @@ jobs:
       - name: Configurar Java
         uses: actions/setup-java@v4
         with:
-          java-version: '17'   # ou '21'
+          java-version: '17'
           distribution: 'temurin'
           cache: 'maven'
 
+      - name: Esperar MySQL iniciar
+        run: |
+          echo "Aguardando MySQL ficar pronto..."
+          for i in {1..30}; do
+            if mysqladmin ping -h127.0.0.1 -uroot --silent; then
+              echo "MySQL está pronto!"
+              break
+            fi
+            sleep 2
+          done
+
       - name: Rodar testes
+        env:
+          SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/lojacarros
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ""
         run: mvn test
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

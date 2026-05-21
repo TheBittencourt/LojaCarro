@@ -32,3 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
+src/test/java/br/org/edu/ifrn/LojaCarro/services/CarroIntegrationTest.java
+src/main/resources/application-test.properties
+

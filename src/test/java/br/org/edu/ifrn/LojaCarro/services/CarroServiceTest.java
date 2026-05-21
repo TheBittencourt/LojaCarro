@@ -16,7 +16,7 @@ class CarroServiceTest {
     // Busca de veículo por ID (já existe no data.sql)
     @Test
     void deveBuscarCarroPorId() {
-        var carro = carroService.findById(1L).orElseThrow();
+        var carro = carroService.findById(99L).orElseThrow();
         assertEquals("Uno", carro.getModelo());
         assertEquals(2010, carro.getAno());
     }
@@ -25,7 +25,7 @@ class CarroServiceTest {
     @Test
     void deveBuscarTodosCarros() {
         var carros = carroService.findAll();
-        assertTrue(carros.size() >= 3); // já existem 3 do data.sql, mas pode haver mais
+        assertTrue(carros.size() >= 3);
     }
 
     // Cadastro de veículo (insere novo registro)
@@ -34,7 +34,7 @@ class CarroServiceTest {
         Carro novo = new Carro();
         novo.setModelo("Honda");
         novo.setAno(2021);
-        novo.setPreco(85000.0); // ✅ preço como Double
+        novo.setPreco(85000.0);
 
         Carro salvo = carroService.save(novo);
 
@@ -45,8 +45,8 @@ class CarroServiceTest {
     // Atualização de veículo
     @Test
     void deveAtualizarCarro() {
-        var carro = carroService.findById(2L).orElseThrow(); // Celta
-        carro.setAno(2020);
+        var carro = carroService.findById(2L).orElseThrow();
+        carro.setAno(20);
         Carro atualizado = carroService.update(carro);
 
         assertEquals(2020, atualizado.getAno());
@@ -58,7 +58,7 @@ class CarroServiceTest {
         Carro carro = new Carro();
         carro.setModelo("Ford");
         carro.setAno(2015);
-        carro.setPreco(45000.0); // ✅ preço como Double
+        carro.setPreco(45000.0);
 
         carro = carroService.save(carro);
 

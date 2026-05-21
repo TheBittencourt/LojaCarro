@@ -34,6 +34,7 @@ class CarroServiceTest {
         Carro novo = new Carro();
         novo.setModelo("Honda");
         novo.setAno(2021);
+        novo.setPreco(85000.0); // ✅ preço como Double
 
         Carro salvo = carroService.save(novo);
 
@@ -57,6 +58,7 @@ class CarroServiceTest {
         Carro carro = new Carro();
         carro.setModelo("Ford");
         carro.setAno(2015);
+        carro.setPreco(45000.0); // ✅ preço como Double
 
         carro = carroService.save(carro);
 

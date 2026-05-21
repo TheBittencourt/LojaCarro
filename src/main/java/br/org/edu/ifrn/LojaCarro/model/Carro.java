@@ -1,6 +1,7 @@
 package br.org.edu.ifrn.LojaCarro.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Carro {
@@ -8,8 +9,14 @@ public class Carro {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    String modelo;
-    int ano;
+
+    @NotNull
+    @Column(nullable = false)
+    private String modelo;
+
+    @NotNull
+    @Column(nullable = false)
+    private Integer ano; // Integer para permitir null e validar corretamente
 
     public Long getId() {
         return id;
@@ -27,11 +34,11 @@ public class Carro {
         this.modelo = modelo;
     }
 
-    public int getAno() {
+    public Integer getAno() {
         return ano;
     }
 
-    public void setAno(int ano) {
+    public void setAno(Integer ano) {
         this.ano = ano;
     }
 }

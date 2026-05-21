@@ -1,119 +1,67 @@
 package br.org.edu.ifrn.LojaCarro.services;
 
 import br.org.edu.ifrn.LojaCarro.model.Carro;
-import br.org.edu.ifrn.LojaCarro.repository.CarroRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.List;
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
 class CarroServiceTest {
 
-    @Mock
-    private CarroRepository carroRepository;
-
-    @InjectMocks
+    @Autowired
     private CarroService carroService;
 
+    // Busca de veículo por ID (já existe no data.sql)
     @Test
-    void saveDeveDelegarParaRepositoryERetornarCarroSalvo() {
-        Carro carro = criarCarro(1L, "Gol", 2020);
-
-        when(carroRepository.save(carro)).thenReturn(carro);
-
-        Carro resultado = carroService.save(carro);
-
-        assertSame(carro, resultado);
-        verify(carroRepository).save(carro);
-        verifyNoMoreInteractions(carroRepository);
+    void deveBuscarCarroPorId() {
+        var carro = carroService.findById(1L).orElseThrow();
+        assertEquals("Uno", carro.getModelo());
+        assertEquals(2010, carro.getAno());
     }
 
+    // Busca de todos os veículos (já existem 3 no data.sql)
     @Test
-    void updateDeveDelegarParaRepositoryERetornarCarroAtualizado() {
-        Carro carro = criarCarro(2L, "Onix", 2022);
-
-        when(carroRepository.save(carro)).thenReturn(carro);
-
-        Carro resultado = carroService.update(carro);
-
-        assertSame(carro, resultado);
-        verify(carroRepository).save(carro);
-        verifyNoMoreInteractions(carroRepository);
+    void deveBuscarTodosCarros() {
+        var carros = carroService.findAll();
+        assertTrue(carros.size() >= 3); // já existem 3 do data.sql, mas pode haver mais
     }
 
+    // Cadastro de veículo (insere novo registro)
     @Test
-    void deleteByIdDeveDelegarParaRepositoryComIdInformado() {
-        Long id = 10L;
+    void deveCadastrarCarro() {
+        Carro novo = new Carro();
+        novo.setModelo("Honda");
+        novo.setAno(2021);
 
-        carroService.deleteById(id);
+        Carro salvo = carroService.save(novo);
 
-        verify(carroRepository, times(1)).deleteById(id);
-        verifyNoMoreInteractions(carroRepository);
+        assertNotNull(salvo.getId());
+        assertEquals("Honda", salvo.getModelo());
     }
 
+    // Atualização de veículo
     @Test
-    void findByIdDeveRetornarCarroQuandoEncontrado() {
-        Long id = 3L;
-        Carro carro = criarCarro(id, "HB20", 2021);
+    void deveAtualizarCarro() {
+        var carro = carroService.findById(2L).orElseThrow(); // Celta
+        carro.setAno(2020);
+        Carro atualizado = carroService.update(carro);
 
-        when(carroRepository.findById(id)).thenReturn(Optional.of(carro));
-
-        Optional<Carro> resultado = carroService.findById(id);
-
-        assertTrue(resultado.isPresent());
-        assertSame(carro, resultado.get());
-        verify(carroRepository).findById(id);
-        verifyNoMoreInteractions(carroRepository);
+        assertEquals(2020, atualizado.getAno());
     }
 
+    // Remoção de veículo
     @Test
-    void findByIdDeveRetornarOptionalVazioQuandoNaoEncontrado() {
-        Long id = 99L;
-
-        when(carroRepository.findById(id)).thenReturn(Optional.empty());
-
-        Optional<Carro> resultado = carroService.findById(id);
-
-        assertTrue(resultado.isEmpty());
-        verify(carroRepository).findById(id);
-        verifyNoMoreInteractions(carroRepository);
-    }
-
-    @Test
-    void findAllDeveRetornarListaDeCarrosDoRepository() {
-        List<Carro> carros = List.of(
-                criarCarro(1L, "Gol", 2020),
-                criarCarro(2L, "Onix", 2022)
-        );
-
-        when(carroRepository.findAll()).thenReturn(carros);
-
-        List<Carro> resultado = carroService.findAll();
-
-        assertEquals(2, resultado.size());
-        assertSame(carros, resultado);
-        verify(carroRepository).findAll();
-        verifyNoMoreInteractions(carroRepository);
-    }
-
-    private Carro criarCarro(Long id, String modelo, int ano) {
+    void deveRemoverCarro() {
         Carro carro = new Carro();
-        carro.setId(id);
-        carro.setModelo(modelo);
-        carro.setAno(ano);
-        return carro;
+        carro.setModelo("Ford");
+        carro.setAno(2015);
+
+        carro = carroService.save(carro);
+
+        carroService.deleteById(carro.getId());
+
+        assertFalse(carroService.findById(carro.getId()).isPresent());
     }
 }
